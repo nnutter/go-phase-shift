@@ -24,6 +24,9 @@ run = "go fmt ./..."
 [tasks.mod-tidy]
 run = "go mod tidy"
 
+[tasks.phase-shift]
+run = "go run ./cmd/phase-shift ./..."
+
 [tasks.staticcheck]
 run = "staticcheck ./..."
 
