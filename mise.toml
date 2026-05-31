@@ -24,6 +24,9 @@ run = "go fmt ./..."
 [tasks.mod-tidy]
 run = "go mod tidy"
 
+[tasks.nilaway]
+run = "nilaway -include-pkgs='github.com/nnutter' ./..."
+
 [tasks.phase-shift]
 run = "go run ./cmd/phase-shift ./..."
 
@@ -31,7 +34,7 @@ run = "go run ./cmd/phase-shift ./..."
 run = "staticcheck ./..."
 
 [tasks.linters]
-depends = ["check-sumtype", "staticcheck", "vet"]
+depends = ["check-sumtype", "nilaway", "staticcheck", "vet"]
 
 [tasks.tests]
 run = "go test -cover ./..."
@@ -42,5 +45,6 @@ run = "go vet ./..."
 [tools]
 go = "1.26.3"
 "go:github.com/alecthomas/go-check-sumtype/cmd/go-check-sumtype" = "v0.3.1"
+"go:go.uber.org/nilaway/cmd/nilaway" = "latest"
 "go:golang.org/x/tools/gopls" = "v0.22.0"
 "go:honnef.co/go/tools/cmd/staticcheck" = "v0.7.0"
