@@ -3,7 +3,7 @@ package report_test
 import (
 	"testing"
 
-	"github.com/phasemerge/phase-shift-go/internal/report"
+	"github.com/phasemerge/go-phase-shift/internal/report"
 	"github.com/stretchr/testify/assert"
 )
 

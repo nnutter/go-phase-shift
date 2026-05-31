@@ -10,7 +10,7 @@ An annotated function must not mutate caller-visible state through parameters or
 Standard `go install` installation,
 
 ```sh
-GOPRIVATE=github.com/phasemerge go install github.com/phasemerge/phase-shift-go/cmd/phase-shift@latest
+GOPRIVATE=github.com/phasemerge go install github.com/phasemerge/go-phase-shift/cmd/phase-shift@latest
 ```
 
 ## Usage
