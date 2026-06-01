@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/phasemerge/phase-shift-go/internal/directive/enum"
+	"github.com/phasemerge/go-phase-shift/internal/directive/enum"
 )
 
 const Prefix = "//phase:"

@@ -3,7 +3,7 @@ package directive_test
 import (
 	"testing"
 
-	"github.com/phasemerge/phase-shift-go/internal/directive"
+	"github.com/phasemerge/go-phase-shift/internal/directive"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

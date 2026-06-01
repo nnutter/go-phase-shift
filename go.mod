@@ -1,4 +1,4 @@
-module github.com/phasemerge/phase-shift-go
+module github.com/phasemerge/go-phase-shift
 
 go 1.26
 
