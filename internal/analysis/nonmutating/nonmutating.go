@@ -5,16 +5,16 @@ import (
 	"go/ast"
 	"go/types"
 
-	"github.com/phasemerge/go-phase-shift/internal/directive"
-	"github.com/phasemerge/go-phase-shift/internal/directive/enum"
-	"github.com/phasemerge/go-phase-shift/internal/report"
+	"github.com/phasemerge/go-constable/internal/directive"
+	"github.com/phasemerge/go-constable/internal/directive/enum"
+	"github.com/phasemerge/go-constable/internal/report"
 	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/analysis/passes/buildssa"
 )
 
 var Analyzer = &analysis.Analyzer{
 	Name: enum.NonmutatingName,
-	Doc:  "reports caller-visible argument mutations in //phase:nonmutating functions",
+	Doc:  "reports caller-visible argument mutations in //constable:nonmutating functions",
 	Requires: []*analysis.Analyzer{
 		buildssa.Analyzer,
 	},

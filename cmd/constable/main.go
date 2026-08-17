@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/phasemerge/go-phase-shift/internal/analysis/nonmutating"
+	"github.com/phasemerge/go-constable/internal/analysis/nonmutating"
 	"golang.org/x/tools/go/analysis/singlechecker"
 )
 

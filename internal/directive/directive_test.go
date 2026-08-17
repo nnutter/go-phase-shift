@@ -3,7 +3,7 @@ package directive_test
 import (
 	"testing"
 
-	"github.com/phasemerge/go-phase-shift/internal/directive"
+	"github.com/phasemerge/go-constable/internal/directive"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -16,13 +16,13 @@ func TestParse(t *testing.T) {
 	}{
 		{
 			name:    "bare tag",
-			comment: "//phase:nonmutating",
+			comment: "//constable:nonmutating",
 			want: []directive.Check{
 				{Name: "nonmutating"},
 			},
 		},
 		{
-			name:    "not a phase tag",
+			name:    "not a constable tag",
 			comment: "//go:noinline",
 		},
 	}
@@ -41,10 +41,10 @@ func TestParseErrors(t *testing.T) {
 		name    string
 		comment string
 	}{
-		{name: "missing name", comment: "//phase:"},
-		{name: "missing quote", comment: "//phase:nonmutating:\"unterminated"},
-		{name: "unquoted value", comment: "//phase:nonmutating:strict"},
-		{name: "invalid check tag", comment: "//phase:othercheck"},
+		{name: "missing name", comment: "//constable:"},
+		{name: "missing quote", comment: "//constable:nonmutating:\"unterminated"},
+		{name: "unquoted value", comment: "//constable:nonmutating:strict"},
+		{name: "invalid check tag", comment: "//constable:othercheck"},
 	}
 
 	for _, test := range tests {
@@ -56,6 +56,6 @@ func TestParseErrors(t *testing.T) {
 }
 
 func TestHasNonmutating(t *testing.T) {
-	assert.True(t, directive.HasNonmutating("//phase:nonmutating"))
+	assert.True(t, directive.HasNonmutating("//constable:nonmutating"))
 	assert.False(t, directive.HasNonmutating("//go:noinline"))
 }

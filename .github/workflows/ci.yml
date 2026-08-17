@@ -47,10 +47,10 @@ jobs:
         shell: bash
         run: |
           mise run check-sumtype
-      - name: Run phase-shift
+      - name: Run constable
         shell: bash
         run: |
-          mise run phase-shift
+          mise run constable
   Test:
     runs-on: ${{ matrix.os }}
     name: Test ${{ matrix.os }}

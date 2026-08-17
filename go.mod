@@ -1,4 +1,4 @@
-module github.com/phasemerge/go-phase-shift
+module github.com/phasemerge/go-constable
 
 go 1.26
 
