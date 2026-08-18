@@ -6,10 +6,10 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/phasemerge/go-phase-shift/internal/directive/enum"
+	"github.com/phasemerge/go-constable/internal/directive/enum"
 )
 
-const Prefix = "//phase:"
+const Prefix = "//constable:"
 
 type Check struct {
 	Name   string

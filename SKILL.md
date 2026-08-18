@@ -1,11 +1,11 @@
 ---
-name: go-phase-shift
-description: Use phase-shift to check that annotated Go functions and methods do not mutate caller-visible argument or receiver state.
+name: go-constable
+description: Use constable to check that annotated Go functions and methods do not mutate caller-visible argument or receiver state.
 ---
 
-# Go Phase Shift
+# Go Constable
 
-`phase-shift` is a Go static analysis tool for opt-in non-mutation checks.
+`constable` is a Go static analysis tool for opt-in non-mutation checks.
 
 Use it when a function or method should read its inputs without changing state that the caller can observe.
 The check does not guarantee that the function is pure or free of all side effects.
@@ -15,13 +15,13 @@ The check does not guarantee that the function is pure or free of all side effec
 Install the released command with:
 
 ```sh
-go install github.com/phasemerge/go-phase-shift/cmd/phase-shift@latest
+go install github.com/phasemerge/go-constable/cmd/constable@latest
 ```
 
 Run it against the packages in a module:
 
 ```sh
-phase-shift ./...
+constable ./...
 ```
 
 The command reports diagnostics and exits unsuccessfully when an annotated function violates the contract.
@@ -29,11 +29,11 @@ An invocation with no diagnostics succeeds silently.
 
 ## Annotating Go code
 
-Put the exact directive `//phase:nonmutating` immediately before the function or method declaration.
-There must not be a space between `//` and `phase:`.
+Put the exact directive `//constable:nonmutating` immediately before the function or method declaration.
+There must not be a space between `//` and `constable:`.
 
 ```go
-//phase:nonmutating
+//constable:nonmutating
 func ReadValue(p *int) int {
  return *p
 }
@@ -48,22 +48,22 @@ The analyzer reports direct mutations through pointer, slice, and map parameters
 It also reports mutations through pointer receivers and through reference-like fields of value receivers.
 
 ```go
-//phase:nonmutating
+//constable:nonmutating
 func WriteValue(p *int) {
  *p = 1 // reported
 }
 
-//phase:nonmutating
+//constable:nonmutating
 func WriteSlice(values []int) {
  values[0] = 1 // reported
 }
 
-//phase:nonmutating
+//constable:nonmutating
 func WriteMap(values map[string]int) {
  values["key"] = 1 // reported
 }
 
-//phase:nonmutating
+//constable:nonmutating
 func DeleteMapEntry(values map[string]int) {
  delete(values, "key") // reported
 }
@@ -72,7 +72,7 @@ type Buffer struct {
  data []byte
 }
 
-//phase:nonmutating
+//constable:nonmutating
 func (b Buffer) ClearFirstByte() {
  b.data[0] = 0 // reported: b.data shares caller-visible backing storage
 }
@@ -88,12 +88,12 @@ Mutating a local variable or a pointer to a local variable is also allowed.
 A value receiver may mutate its scalar fields because those fields belong to the receiver copy.
 
 ```go
-//phase:nonmutating
+//constable:nonmutating
 func ReassignParameter(p *int) {
  p = nil // allowed
 }
 
-//phase:nonmutating
+//constable:nonmutating
 func MutateLocal() int {
  value := 0
  value++ // allowed
@@ -104,7 +104,7 @@ type Count struct {
  n int
 }
 
-//phase:nonmutating
+//constable:nonmutating
 func (c Count) Increment() Count {
  c.n++ // allowed: c is a value-receiver copy
  return c
@@ -114,8 +114,8 @@ func (c Count) Increment() Count {
 ## Agent workflow
 
 1. Identify functions and methods whose API contract should not mutate caller-owned data.
-2. Add `//phase:nonmutating` immediately before each eligible declaration.
-3. Run `phase-shift ./...` from the Go module root.
+2. Add `//constable:nonmutating` immediately before each eligible declaration.
+3. Run `constable ./...` from the Go module root.
 4. For every diagnostic, either remove the caller-visible mutation or remove the annotation if the contract is incorrect.
 5. Re-run the analyzer and the package tests before finalizing the change.
 

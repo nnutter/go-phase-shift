@@ -1,13 +1,13 @@
-# Phase Shift Plan
+# Constable Plan
 
-Phase Shift Go is a static analysis tool for Go.
+Constable is a static analysis tool for Go.
 Its first goal is to provide opt-in semantic checks that help developers state and enforce code contracts that Go does not currently express in the type system.
 The long-term goal is for these checks to be usable from the command line, test suites, CI, and `gopls`.
 
 The initial check verifies a function is nonmutating,
 
 ```go
-//phase:nonmutating
+//constable:nonmutating
 func Example(arg *Config) Result {
 	// The function must not mutate caller-visible state through its arguments.
 }
@@ -23,7 +23,7 @@ The definition of "nonmutating" does not imply more general immutability nor doe
 - Build analyzers on top of `golang.org/x/tools/go/analysis`.
 - Keep checks independently usable, testable, and composable.
 - Design analyzer output so it can be consumed by `gopls` diagnostics.
-- Start with one focused check: `//phase:nonmutating` on functions and methods.
+- Start with one focused check: `//constable:nonmutating` on functions and methods.
 - Use Go SSA where it provides better semantic information than AST-only inspection.
 - Prefer precise, explainable diagnostics over broad but noisy warnings.
 
@@ -40,14 +40,14 @@ The project should follow the shape used by common Go analysis tools such as Sta
 Proposed package layout:
 
 ```text
-cmd/phase-shift/
+cmd/constable/
     Main command-line entry point.
 
 internal/analysis/nonmutating/
-    The initial //phase:nonmutating analyzer.
+    The initial //constable:nonmutating analyzer.
 
 internal/directive/
-    Parsing and validation for //phase: directives.
+    Parsing and validation for //constable: directives.
 
 internal/report/
     Shared diagnostic helpers if multiple analyzers later need them.
@@ -67,7 +67,7 @@ The command-line tool can use `singlechecker` while there is only one analyzer a
 Expected flow:
 
 1. Load packages through the standard analysis driver.
-2. Parse `//phase:` directives from function and method declarations.
+2. Parse `//constable:` directives from function and method declarations.
 3. For each recognized directive, run the corresponding analyzer logic.
 4. Emit diagnostics through `analysis.Pass.Report` with stable, actionable messages.
 
@@ -75,18 +75,18 @@ The analyzer should avoid defining its own package loading, type checking, or di
 
 ## Directive Syntax
 
-Directive comments use the `phase` namespace:
+Directive comments use the `constable` namespace:
 
 ```go
-//phase:nonmutating
+//constable:nonmutating
 func F() {}
 ```
 
 Initial parsing rules:
 
 - A directive applies to the immediately following function or method declaration.
-- A directive begins with `//phase:`.
-- Use Go struct tag syntax after `//phase:` for directive options; see [reflect.StructTag](https://pkg.go.dev/reflect#StructTag).
+- A directive begins with `//constable:`.
+- Use Go struct tag syntax after `//constable:` for directive options; see [reflect.StructTag](https://pkg.go.dev/reflect#StructTag).
   The sturct tag key refers to the check name, e.g., `nonmutating`.
   The value can be parsed specific to the check's options (if any) but typically is a simple comma-separated list of options.
   Ideally, we should tolerate omitting the `:""` part of the struct tag if there are no options.
@@ -96,41 +96,41 @@ Initial parsing rules:
 The proposed syntax leaves room for new, future checks:
 
 ```go
-//phase:nonmutating othercheck:"safe,strict"
+//constable:nonmutating othercheck:"safe,strict"
 ```
 
-## Initial Check: `//phase:nonmutating`
+## Initial Check: `//constable:nonmutating`
 
 The `nonmutating` analyzer verifies that annotated functions do not mutate state that is visible to the caller through parameters or method receivers.
 
 Examples that should be reported:
 
 ```go
-//phase:nonmutating
+//constable:nonmutating
 func MutatesPointer(p *int) {
 	*p = 1
 }
 
-//phase:nonmutating
+//constable:nonmutating
 func MutatesSlice(s []int) {
 	s[0] = 1
 }
 
-//phase:nonmutating
+//constable:nonmutating
 func MutatesMap(m map[string]int) {
 	m["x"] = 1
 }
 
 type Counter struct{ n int }
 
-//phase:nonmutating
+//constable:nonmutating
 func (c *Counter) Inc() {
 	c.n++
 }
 
 type Buffer struct{ data []byte }
 
-//phase:nonmutating
+//constable:nonmutating
 func (b Buffer) ClearFirstByte() {
 	b.data[0] = 0
 }
@@ -139,26 +139,26 @@ func (b Buffer) ClearFirstByte() {
 Examples that should be allowed:
 
 ```go
-//phase:nonmutating
+//constable:nonmutating
 func ReadsPointer(p *int) int {
 	return *p
 }
 
-//phase:nonmutating
+//constable:nonmutating
 func MutatesLocal() int {
 	x := 0
 	x++
 	return x
 }
 
-//phase:nonmutating
+//constable:nonmutating
 func ReassignsParameter(p *int) {
 	p = nil // Does not mutate the caller's pointed-to value.
 }
 
 type Count struct{ n int }
 
-//phase:nonmutating
+//constable:nonmutating
 func (c Count) Increment() Count {
 	c.n++ // Mutates only the receiver copy.
 	return c
@@ -214,14 +214,14 @@ That means it analyzes the body of the annotated function directly and reports o
 Future versions can add summaries for functions:
 
 - Which parameters may be mutated.
-- Whether a function is annotated `//phase:nonmutating` and already checked.
+- Whether a function is annotated `//constable:nonmutating` and already checked.
 - Whether a known standard-library function mutates an argument.
 - Whether calls through interfaces or function values are unknown.
 
 This summary model will matter for code such as:
 
 ```go
-//phase:nonmutating
+//constable:nonmutating
 func F(p *int) {
 	G(p)
 }
@@ -239,10 +239,10 @@ Diagnostics should be specific and located at the mutation site when possible.
 
 Example messages:
 
-- `//phase:nonmutating function mutates pointer parameter p`
-- `//phase:nonmutating method mutates receiver c`
-- `//phase:nonmutating function mutates map parameter m`
-- `//phase:nonmutating function deletes from map parameter m`
+- `//constable:nonmutating function mutates pointer parameter p`
+- `//constable:nonmutating method mutates receiver c`
+- `//constable:nonmutating function mutates map parameter m`
+- `//constable:nonmutating function deletes from map parameter m`
 
 Diagnostics should avoid claiming more than the analyzer has proven.
 If a case is uncertain, the message should say so explicitly or the analyzer should remain silent until the policy is clear.
@@ -271,7 +271,7 @@ As the analyzer grows, tests should separate behavior-preserving refactors from 
 The first command should run the analyzer over packages in the same style as other Go analysis tools:
 
 ```sh
-phase-shift ./...
+constable ./...
 ```
 
 While there is only one analyzer, `singlechecker.Main(nonmutating.Analyzer)` is enough.
@@ -298,16 +298,16 @@ Direct `gopls` integration can wait until the check is useful and well tested.
 
 These questions should be resolved incrementally as implementation begins:
 
-1. Should `//phase:` options use struct-tag syntax, Go directive-style syntax, or a simpler custom syntax?
-2. Should unknown `//phase:` directives be diagnostics, ignored comments, or reserved for future tools?
-3. Should `//phase:nonmutating` forbid mutation of package globals, or only mutation of caller-visible argument and receiver state?
+1. Should `//constable:` options use struct-tag syntax, Go directive-style syntax, or a simpler custom syntax?
+2. Should unknown `//constable:` directives be diagnostics, ignored comments, or reserved for future tools?
+3. Should `//constable:nonmutating` forbid mutation of package globals, or only mutation of caller-visible argument and receiver state?
 4. How should calls to unanalyzed functions be handled: ignored, reported as uncertain, or controlled by a strict mode?
 5. Should calls to methods on parameter-derived values be assumed mutating when the receiver is mutable?
 6. How should interface calls and function values be modeled?
 7. Should mutation through `unsafe`, reflection, cgo, or assembly be reported as unsupported in annotated functions?
 8. Should appending to a slice parameter be considered mutation only when it writes to the existing backing array, or always treated as caller-visible?
 9. Should the analyzer permit mutations to data reachable from parameters if the function can prove the data was freshly allocated inside the function?
-10. What should the project name and module path be?
+10. The project name and module path are `constable` and `github.com/phasemerge/go-constable`.
 
 ## First Implementation Milestone
 
@@ -315,7 +315,7 @@ The first milestone is a minimal but real analyzer:
 
 1. Create a Go module.
 2. Add a `nonmutating` analyzer using `go/analysis` and `buildssa`.
-3. Parse `//phase:nonmutating` comments on function and method declarations.
+3. Parse `//constable:nonmutating` comments on function and method declarations.
 4. Detect direct pointer, receiver, slice, and map mutations in annotated functions.
 5. Add analyzer tests for the supported cases and explicit non-cases.
 6. Add a thin command-line entry point using `singlechecker`.

@@ -27,8 +27,8 @@ run = "go mod tidy"
 [tasks.nilaway]
 run = "nilaway -include-pkgs='github.com/nnutter' ./..."
 
-[tasks.phase-shift]
-run = "go run ./cmd/phase-shift ./..."
+[tasks.constable]
+run = "go run ./cmd/constable ./..."
 
 [tasks.staticcheck]
 run = "staticcheck ./..."

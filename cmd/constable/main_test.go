@@ -49,7 +49,7 @@ func TestCLIUsingAnalyzerTestData(t *testing.T) {
 	}
 
 	moduleDir := writeModule(t, m)
-	output, err := runPhaseShift(t, binary, moduleDir)
+	output, err := runConstable(t, binary, moduleDir)
 	assert.Error(t, err)
 	for _, want := range wants {
 		assert.Contains(t, output, want)
@@ -67,18 +67,18 @@ func TestCLINonmutatingFail(t *testing.T) {
 		GoFile: []string{
 			"package failing",
 			"",
-			"//phase:nonmutating",
+			"//constable:nonmutating",
 			"func F(p *int) {",
 			"\t*p = 1",
 			"}",
 		},
 	})
 
-	output, err := runPhaseShift(t, binary, moduleDir)
+	output, err := runConstable(t, binary, moduleDir)
 
 	assert.Error(t, err)
 	assert.Contains(t, output, "a.go:5:2")
-	assert.Contains(t, output, "//phase:nonmutating function mutates pointer parameter p")
+	assert.Contains(t, output, "//constable:nonmutating function mutates pointer parameter p")
 }
 
 func TestCLINonmutating(t *testing.T) {
@@ -92,14 +92,14 @@ func TestCLINonmutating(t *testing.T) {
 		GoFile: []string{
 			"package passing",
 			"",
-			"//phase:nonmutating",
+			"//constable:nonmutating",
 			"func F(p *int) int {",
 			"\treturn *p",
 			"}",
 		},
 	})
 
-	output, err := runPhaseShift(t, binary, moduleDir)
+	output, err := runConstable(t, binary, moduleDir)
 
 	require.NoError(t, err, output)
 	assert.Empty(t, output)
@@ -115,11 +115,11 @@ func buildBinary(t *testing.T) string {
 	require.NoError(t, os.MkdirAll(tmpRoot, 0o755))
 	t.Setenv("GOTMPDIR", tmpRoot)
 
-	binary := filepath.Join(t.TempDir(), "phase-shift")
+	binary := filepath.Join(t.TempDir(), "constable")
 	if runtime.GOOS == "windows" {
 		binary += ".exe"
 	}
-	command := exec.Command("go", "build", "-o", binary, "./cmd/phase-shift")
+	command := exec.Command("go", "build", "-o", binary, "./cmd/constable")
 	command.Dir = repoRoot
 	output, err := command.CombinedOutput()
 	require.NoError(t, err, string(output))
@@ -140,7 +140,7 @@ func writeModule(t *testing.T, m module) string {
 	return moduleDir
 }
 
-func runPhaseShift(t *testing.T, binary string, moduleDir string) (string, error) {
+func runConstable(t *testing.T, binary string, moduleDir string) (string, error) {
 	t.Helper()
 
 	command := exec.Command(binary, "./...")

@@ -9,56 +9,56 @@ func OtherAnnotationMutation(p *int) {
 	*p = 1
 }
 
-//phase:nonmutating
+//constable:nonmutating
 func MutatesPointer(p *int) {
-	*p = 1 // want "//phase:nonmutating function mutates pointer parameter p"
+	*p = 1 // want "//constable:nonmutating function mutates pointer parameter p"
 }
 
-//phase:nonmutating
+//constable:nonmutating
 func ReadsPointer(p *int) int {
 	return *p
 }
 
-//phase:nonmutating
+//constable:nonmutating
 func ReassignsParameter(p *int) {
 	p = nil
 }
 
-//phase:nonmutating
+//constable:nonmutating
 func MutatesPointerAlias(p *int) {
 	q := p
-	*q = 1 // want "//phase:nonmutating function mutates pointer parameter p"
+	*q = 1 // want "//constable:nonmutating function mutates pointer parameter p"
 }
 
-//phase:nonmutating
+//constable:nonmutating
 func MutatesSlice(s []int) {
-	s[0] = 1 // want "//phase:nonmutating function mutates parameter s"
+	s[0] = 1 // want "//constable:nonmutating function mutates parameter s"
 }
 
-//phase:nonmutating
+//constable:nonmutating
 func MutatesSliceAlias(s []int) {
 	t := s
-	t[0] = 1 // want "//phase:nonmutating function mutates parameter s"
+	t[0] = 1 // want "//constable:nonmutating function mutates parameter s"
 }
 
-//phase:nonmutating
+//constable:nonmutating
 func MutatesMap(m map[string]int) {
-	m["x"] = 1 // want "//phase:nonmutating function mutates parameter m"
+	m["x"] = 1 // want "//constable:nonmutating function mutates parameter m"
 }
 
-//phase:nonmutating
+//constable:nonmutating
 func DeletesMapEntry(m map[string]int) {
-	delete(m, "x") // want "//phase:nonmutating function deletes from map parameter m"
+	delete(m, "x") // want "//constable:nonmutating function deletes from map parameter m"
 }
 
-//phase:nonmutating
+//constable:nonmutating
 func MutatesLocal() int {
 	x := 0
 	x++
 	return x
 }
 
-//phase:nonmutating
+//constable:nonmutating
 func MutatesLocalPointer() int {
 	x := 0
 	p := &x
@@ -68,14 +68,14 @@ func MutatesLocalPointer() int {
 
 type Counter struct{ n int }
 
-//phase:nonmutating
+//constable:nonmutating
 func (c *Counter) Inc() {
-	c.n++ // want "//phase:nonmutating method mutates receiver c"
+	c.n++ // want "//constable:nonmutating method mutates receiver c"
 }
 
 type Count struct{ n int }
 
-//phase:nonmutating
+//constable:nonmutating
 func (c Count) Increment() Count {
 	c.n++
 	return c
@@ -83,42 +83,42 @@ func (c Count) Increment() Count {
 
 type Buffer struct{ data []byte }
 
-//phase:nonmutating
+//constable:nonmutating
 func (b Buffer) ClearFirstByte() {
-	b.data[0] = 0 // want "//phase:nonmutating method mutates receiver b"
+	b.data[0] = 0 // want "//constable:nonmutating method mutates receiver b"
 }
 
 type Holder struct{ p *int }
 
-//phase:nonmutating
+//constable:nonmutating
 func (h Holder) MutatesPointedValue() {
-	*h.p = 1 // want "//phase:nonmutating method mutates receiver h"
+	*h.p = 1 // want "//constable:nonmutating method mutates receiver h"
 }
 
 type MHolder struct{ m map[string]int }
 
-//phase:nonmutating
+//constable:nonmutating
 func (h MHolder) MutatesMapField() {
-	h.m["x"] = 1 // want "//phase:nonmutating method mutates receiver h"
+	h.m["x"] = 1 // want "//constable:nonmutating method mutates receiver h"
 }
 
-//phase:nonmutating
+//constable:nonmutating
 func (h Holder) ReplacesPointerInCopy() {
 	h.p = nil
 }
 
-//phase:nonmutating
+//constable:nonmutating
 func MutatesNestedSlice(ss [][]int) {
-	ss[0][0] = 1 // want "//phase:nonmutating function mutates parameter ss"
+	ss[0][0] = 1 // want "//constable:nonmutating function mutates parameter ss"
 }
 
-//phase:nonmutating
+//constable:nonmutating
 func DeletesLocalMap() {
 	m := map[string]int{}
 	delete(m, "x")
 }
 
-//phase:nonmutating
+//constable:nonmutating
 func MutatesDoublePointer(pp **int) {
-	**pp = 1 // want "//phase:nonmutating function mutates pointer parameter pp"
+	**pp = 1 // want "//constable:nonmutating function mutates pointer parameter pp"
 }

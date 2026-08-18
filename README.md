@@ -1,8 +1,8 @@
-# phase-shift
+# constable
 
-phase-shift is a static analysis tool for Go.
+constable is a static analysis tool for Go.
 
-The first analyzer checks functions annotated with `//phase:nonmutating`.
+The first analyzer checks functions annotated with `//constable:nonmutating`.
 An annotated function must not mutate caller-visible state through parameters or method receivers.
 
 ## Installation
@@ -10,15 +10,15 @@ An annotated function must not mutate caller-visible state through parameters or
 Standard `go install` installation,
 
 ```sh
-GOPRIVATE=github.com/phasemerge go install github.com/phasemerge/go-phase-shift/cmd/phase-shift@latest
+go install github.com/phasemerge/go-constable/cmd/constable@latest
 ```
 
 ## Usage
 
-Run `phase-shift` on your Go packages,
+Run `constable` on your Go packages,
 
 ```sh
-phase-shift ./...
+constable ./...
 ```
 
 ## Example
@@ -26,7 +26,7 @@ phase-shift ./...
 This function is reported because it mutates through a pointer parameter,
 
 ```go
-//phase:nonmutating
+//constable:nonmutating
 func F(p *int) {
 	*p = 1
 }
@@ -35,7 +35,7 @@ func F(p *int) {
 This function is allowed because it only reads through the pointer parameter,
 
 ```go
-//phase:nonmutating
+//constable:nonmutating
 func F(p *int) int {
 	return *p
 }
@@ -46,7 +46,7 @@ This method is allowed because a scalar field assignment on a value receiver mut
 ```go
 type Count struct{ n int }
 
-//phase:nonmutating
+//constable:nonmutating
 func (c Count) Increment() Count {
 	c.n++
 	return c
@@ -58,7 +58,7 @@ This method is reported because the slice field is mutated for the caller,
 ```go
 type Buffer struct{ data []byte }
 
-//phase:nonmutating
+//constable:nonmutating
 func (b Buffer) ClearFirstByte() {
 	b.data[0] = 0
 }
