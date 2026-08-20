@@ -1,5 +1,32 @@
+[tasks.fix]
+depends = ["go-fix", "go-fmt", "go-mod-tidy"]
+
+[tasks.go-fix]
+run = "go fix ./..."
+
+[tasks.go-fmt]
+run = "go fmt ./..."
+
+[tasks.go-mod-tidy]
+run = "go mod tidy"
+
+[tasks.lint]
+depends = ["check-sumtype", "constable", "nilaway", "staticcheck", "vet"]
+
 [tasks.check-sumtype]
-run = "go-check-sumtype ./..."
+run = "go tool go-check-sumtype ./..."
+
+[tasks.constable]
+run = "go run ./cmd/constable ./..."
+
+[tasks.nilaway]
+run = "go tool nilaway -include-pkgs='github.com/nnutter' ./..."
+
+[tasks.staticcheck]
+run = "go tool staticcheck ./..."
+
+[tasks.vet]
+run = "go vet ./..."
 
 [tasks.coverage-data]
 run = "go test -coverprofile coverage.out ./..."
@@ -12,39 +39,8 @@ run = "go tool cover -html=coverage.out -o coverage.html"
 depends = ["coverage-html"]
 run = "xdg-open coverage.html 2>/dev/null || open coverage.html"
 
-[tasks.fix]
-run = "go fix ./..."
-
-[tasks.fixers]
-depends = ["fix", "fmt", "mod-tidy"]
-
-[tasks.fmt]
-run = "go fmt ./..."
-
-[tasks.mod-tidy]
-run = "go mod tidy"
-
-[tasks.nilaway]
-run = "nilaway -include-pkgs='github.com/nnutter' ./..."
-
-[tasks.constable]
-run = "go run ./cmd/constable ./..."
-
-[tasks.staticcheck]
-run = "staticcheck ./..."
-
-[tasks.linters]
-depends = ["check-sumtype", "nilaway", "staticcheck", "vet"]
-
 [tasks.tests]
 run = "go test -cover ./..."
 
-[tasks.vet]
-run = "go vet ./..."
-
 [tools]
-go = "1.26.3"
-"go:github.com/alecthomas/go-check-sumtype/cmd/go-check-sumtype" = "v0.3.1"
-"go:go.uber.org/nilaway/cmd/nilaway" = "latest"
-"go:golang.org/x/tools/gopls" = "v0.22.0"
-"go:honnef.co/go/tools/cmd/staticcheck" = "v0.7.0"
+go = "1.27.0"

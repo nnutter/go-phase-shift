@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/phasemerge/go-constable/internal/directive/enum"
+	"github.com/nnutter/go-constable/internal/directive/enum"
 )
 
 const Prefix = "//constable:"

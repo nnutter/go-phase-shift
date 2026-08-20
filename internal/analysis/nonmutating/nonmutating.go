@@ -5,9 +5,9 @@ import (
 	"go/ast"
 	"go/types"
 
-	"github.com/phasemerge/go-constable/internal/directive"
-	"github.com/phasemerge/go-constable/internal/directive/enum"
-	"github.com/phasemerge/go-constable/internal/report"
+	"github.com/nnutter/go-constable/internal/directive"
+	"github.com/nnutter/go-constable/internal/directive/enum"
+	"github.com/nnutter/go-constable/internal/report"
 	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/analysis/passes/buildssa"
 )
