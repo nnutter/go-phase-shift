@@ -3,7 +3,7 @@ package nonmutating_test
 import (
 	"testing"
 
-	"github.com/phasemerge/go-constable/internal/analysis/nonmutating"
+	"github.com/nnutter/go-constable/internal/analysis/nonmutating"
 	"golang.org/x/tools/go/analysis/analysistest"
 )
 

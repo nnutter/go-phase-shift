@@ -1,4 +1,4 @@
-module github.com/phasemerge/go-constable
+module github.com/nnutter/go-constable
 
 go 1.27.0
 
